@@ -1,0 +1,141 @@
+<aside>
+📚 Primeiros passos
+
+</aside>
+
+1 - O que o ISQL faz?
+
+Conecta automaticamente ao banco de dados e podemos estar fazendo comandos
+
+2 - Para que serve um banco de dados?
+
+Serve para armazenar todos os dados de um sistema
+
+3 - O que é MVC e o que tem a ver com SQL?
+
+MVC é Movie View e Controller. 
+
+- View é aonde o usuário irá visualizar, é o HTML, CSS, Telas, VCL do Delphi
+- Controller é a regra de negócios do sistema
+- Model é representação de classes do banco de dados, são as tabelas
+
+<aside>
+📚 Modelagem e Primeiras Operações
+
+</aside>
+
+1 - Como fazer um comentário no SQL?
+
+Há o `/* */` para múltiplas linhas e também o `—` para linhas únicas
+
+2 - O que é Modelagem Conceitual?
+
+É um rascunho do banco de dados
+
+```sql
+	CLIENTE
+		NOME 	 VARCHAR(30),
+		CPF      VARCHAR(11),
+		EMAIL    VARCHAR(100),
+		TELEFONE VARCHAR(30),
+		SEXO 	 CHAR(1),
+		ENDERECO VARCHAR(100)
+```
+
+3 - O que é Modelagem Lógica?
+
+É o software
+
+4 - O que é modelagem física?
+
+É o script do banco de dados
+
+5 - Como criamos um banco de dados no FB?
+
+Abrimos o ISQL e digitamos `CREATE DATABASE '<Ditetorio>\NomeDoArquivo.FDB' user 'SYSDBA' password 'masterkey'`
+
+6 - Como acessamos um banco de dados no FB?
+
+Abrimos o ISQL e digitamos `connect '<Diretorio>' user 'SYSDBA' password 'masterkey'`
+
+7 - Como fazemos para criar uma tabela?
+
+Nos colocamos no ISQL a criação da tabela
+
+```sql
+CREATE TABLE CLIENTE(
+NOME 	 VARCHAR(30),
+CPF      VARCHAR(11),
+EMAIL    VARCHAR(100),
+TELEFONE VARCHAR(30),
+SEXO 	 CHAR   (1),
+ENDERECO VARCHAR(100));
+```
+
+8 - Como fazemos para ver se a tabela foi criada?
+
+Vamos no ISQL e digitamos `show tables;`
+
+9 - Como colocamos dados na tabela?
+
+Utilizamos as combinações `INSERT INTO` e `VALUES`
+
+```sql
+INSERT INTO CLIENTE(NOME, CPF, EMAIL, TELEFONE, SEXO, ENDERECO) VALUES ('EMANUEL', '12345678910', 'e@e.com', '+99 99 9 9999-9999', 'M', 'RUA TAL DO BAIRRO TAL E CIDADE TAL');
+```
+
+OU
+
+```sql
+INSERT INTO CLIENTE VALUES ('EMANUEL', '12345678910', 'e@e.com', '+99 99 9 9999-9999', 'M', 'RUA TAL DO BAIRRO TAL E CIDADE TAL');
+```
+
+‘Podemos’ adicionar metade também
+
+```sql
+INSERT INTO CLIENTE (NOME, CPF, SEXO) VALUES ('HALANA', '12345678910', 'F');
+```
+
+10 - Quais são os tipos de dados?
+
+- CHAR: Vai ocupar a quantidade de caracteres que você colocar, não importa a quantidade setada e quantidade escrita;
+- VARCHAR: Não ocupa todo o espaço caso sobre
+
+11 - Como podemos ver as colunas que temos na nossa tabela?
+
+Digitamos `show table <nomeDaTabela>;`
+
+12 - Como fazemos para puxar os dados do banco de dados?
+
+Utilizamos o `SELECT` por exemplo: `SELECT * FROM CLIENTE;` podemos utilizar também `SELECT nome, cpf FROM CLIENTE;`
+
+13 - Como podemos mudar o nome da tabela?
+
+Podemos utilizar o `AS` para ele ser visto de forma diferente, veja:
+
+```sql
+SELECT nome as name, telefone as phone, cpf as register FROM cliente;
+```
+
+14 - Como podemos filtrar o nossos campos?
+
+Para filtrarmos nós utilizamos o `WHERE` que significa ‘aonde’, podemos utilizar o `LIKE` para dizer se aquela palavra está em algum lugar de um endereço por exemplo, e utilizamos `%` se ele estiver assim `%botafogo` queremos dizer que ela é a última palavra, se for assim `botafogo%` dizemos que ela é a primeira palavra e se for assim `%botafogo%` dizemos que antes e depois dela tem alguma coisa, veja os exemplos:
+
+```sql
+SELECT NOME, SEXO FROM CLIENTE WHERE SEXO = 'M';
+```
+
+Há também:
+
+```sql
+SELECT NOME, ENDERECO FROM CLIENTE WHERE ENDERECO LIKE '%BAIRRO%';
+```
+
+15 - Quais são os os operadores lógicos?
+
+São: AND; OR; IS NOT, veja:
+
+```sql
+SELECT nome from cliente where telefone is not null;
+SELECT nome, cpf from cliente where cpf is not null and sexo = 'F';
+```

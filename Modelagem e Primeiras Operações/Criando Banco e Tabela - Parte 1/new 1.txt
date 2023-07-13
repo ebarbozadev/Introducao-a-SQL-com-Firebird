@@ -1,0 +1,36 @@
+/*
+	MODELAGEM BÁSICA
+	
+	CRIAR UM CLIENTE QUE TENHA:
+	NOME; CPF; EMAIL; TELEFONE; SEXO; ENDERECO
+*/
+
+CLIENTE
+/* 
+	VARCHAR: Quantidade de caracteres possíveis
+	   CHAR: Vai ocupar a quantidade que está
+			     Exemplo, no VARCHAR se eu colocar 100 e escrever apenas 10 ele não irá ocupar os 100, se for CHAR ele irá ocupar os 100
+*/ 
+NOME 	 VARCHAR(30),
+CPF      VARCHAR(11),
+EMAIL    VARCHAR(100),
+TELEFONE VARCHAR(30),
+SEXO 	 CHAR   (1),
+ENDERECO VARCHAR(100)
+
+/*
+	PROCESSO DE MODELAGEM
+	
+	MODELAGEM CONCEITUAL - RASCUNHOS
+		CLIENTE
+		NOME 	 VARCHAR(30),
+		CPF      VARCHAR(11),
+		EMAIL    VARCHAR(100),
+		TELEFONE VARCHAR(30),
+		SEXO 	 CHAR(1),
+		ENDERECO VARCHAR(100)
+		
+	MODELAGEM LOGICA     - BRMODELO (SOFTWARE)
+	
+	MODELAGEM FISICA     - SCRIPT DO BANCO DE DADOS
+*/
