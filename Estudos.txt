@@ -216,6 +216,12 @@ Utilizamos o `UNIQUE`: `CPF VARCHAR(15) UNIQUE;`
 	PRIMARY KEY(IDCLIENTE): Fala qual coluna da nossa tabela vai ser a chave primária
 */
 ALTER TABLE CLIENTE CONSTRAINT PKIDCLIENTE PRIMARY KEY(IDCLIENTE);
+
+-- OU
+
+CREATE TABLE CLIENTE(
+	IDCLIENTE INTEGER NOT NULL PRIMARY KEY;
+);
 ```
 
 24 - Como definimos a chave estrangeira?
@@ -300,8 +306,383 @@ BEGIN
 END;
 ```
 
+OU
+
+```sql
+CREATE TABLE CARRO(
+	IDCLIENTE INTEGER NOT NULL
+);
+
+ALTER TABLE CLIENTE ADD CONSTRAINT FK_IDCLIENTE KEY(IDCLIENTE) REFERENCES CLIENTE(IDCLIENTE);
+```
+
 25 - O que é Query?
 
 Query é uma consulta SQL
 
 26 - Como fazemos uma chave primária?
+
+Fazemos isso na criação do banco de dados:
+
+```sql
+CREATE TABLE CLIENTE (
+	IDCLIENTE INTEGER NOT NULL,
+	NOME VARCHAR(60),
+	PRIMARY KEY(IDCLIENTE)
+);
+```
+
+27 - Como fazemos uma chave estrangeira?
+
+Fazemos a criação da chave estrangeira na criação da tabela
+
+```sql
+CREATE TABLE TELEFONE (
+	IDTELEFONE INTEGER NOOT NULL,
+	TELEFONE VARCHAR(30),
+	IDCLIENTE INTEGER,
+	PRIMARY KEY(IDTELEFONE),
+	FOREIGN KEY(IDCLIENTE) REFERENCES CLIENTE(IDCLIENTE);
+);
+```
+
+28 - Como criamos uma trigger para adicionar um auto incremento de ID?
+
+```sql
+CREATE TRIGGER TG_INSERTIDCLIENTE FOR CLIENTE
+BEFORE INSERT POSITION 0
+AS
+BEGIN
+	NEW.IDCLIENTE = COALESCE((SELECT MAX(IDCLIENTE) FROM CLIENTE), 0) + 1;
+END ^
+```
+
+29 - Como podemos juntar tabelas?
+
+Utilizamos o `INNER JOIN` e damos algumas nomenclaturas para conseguirmos identificar qual é qual, veja:
+
+```sql
+SELECT C.NOME, T.TELEFONE, E.UF
+FROM CLIENTE C
+INNER JOIN TELEFONE T ON C.IDCLIENTE = T.IDCLIENTE
+INNER JOIN ENDERECO E ON C.IDCLIENTE = E.IDCLIENTE
+WHERE E.UF = 'RJ' AND T.TIPO = 'RES';
+```
+
+30 - O que o `COALESCE` faz?
+
+Nós conseguimos setar um valor para quando há um valor nulo
+
+```sql
+SELECT C.NOME, COALESCE(C.EMAIL, 'SEM EMAIL'), T.EMAIL
+```
+
+31 - O que é VIEW?
+
+A `VIEW` nós conseguimos deixar um padrão caso nós queiramos ver um relatório, a VIEW é uma query, e vamos utilizar uma query para ver a query
+
+```sql
+CREATE OR ALTER VIEW V_CLIENTES AS
+	SELECT C.IDCLIENTE AS ID, C.NOME, C.SEXO AS GENERO, T.TELEFONE, T.TIPO, E.UF AS ESTADO
+	FROM CLIENTE C
+	INNER JOIN TELEFONE T ON T.IDCLIENTE = C.IDCLIENTE
+	INNER JOIN ENDERECO E ON E.IDCLIENTE = C.IDCLIENTE;
+```
+
+Conseguimos ver assim:
+
+```sql
+SELECT * FROM V_CLIENTES;
+```
+
+Podemos colocar condicionais também:
+
+```sql
+SELECT * FROM V_CLIENTES WHERE NOME = 'Cliente 1';
+```
+
+32 - Conseguimos dar `UPDATE` em alguma VIEW?
+
+Sim, apenas se ela não tiver `INNER JOIN`
+
+33 - Como fazemos para ver as `VIEW`?
+
+Podemos digitar: `SHOW VIEW;`
+
+34 - Para que serve o `ORDER`?
+
+Serve para ordenarmos a nossa busca, podemos ordenar por ordem alfabética e também por ordem ascendente (asc) ou descendente (desc)podemos ordenar por colunar também, colocando o índice que queremos
+
+```sql
+-- ORDEM ALFABÉTICA
+SELECT C.NOME, T.TELEFONE, E.UF
+FROM CLIENTE C
+INNER JOIN TELEFONE T ON T.IDTELEFONE = C.IDCLIENTE
+INNER JOIN ENDERECO E ON E.IDENDERECO = C.IDCLIENTE
+ORDER BY C.NOME;
+
+-- ORDEM CRESCENTE
+SELECT C.NOME, T.TELEFONE, E.UF
+FROM CLIENTE C
+INNER JOIN TELEFONE T ON T.IDTELEFONE = C.IDCLIENTE
+INNER JOIN ENDERECO E ON E.IDENDERECO = C.IDCLIENTE
+ORDER BY T.TELEFONE ASC;
+
+-- ORDEM DECRESCENTE
+SELECT C.NOME, T.TELEFONE, E.UF
+FROM CLIENTE C
+INNER JOIN TELEFONE T ON T.IDTELEFONE = C.IDCLIENTE
+INNER JOIN ENDERECO E ON E.IDENDERECO = C.IDCLIENTE
+ORDER BY T.TELEFONE DESC;
+
+-- ORDEM POR ÍNDICE
+SELECT C.NOME, T.TELEFONE, E.UF
+FROM CLIENTE C
+INNER JOIN TELEFONE T ON T.IDTELEFONE = C.IDCLIENTE
+INNER JOIN ENDERECO E ON E.IDENDERECO = C.IDCLIENTE
+ORDER BY 1;
+
+SELECT C.NOME, T.TELEFONE, E.UF
+FROM CLIENTE C
+INNER JOIN TELEFONE T ON T.IDTELEFONE = C.IDCLIENTE
+INNER JOIN ENDERECO E ON E.IDENDERECO = C.IDCLIENTE
+ORDER BY 1 DESC;
+
+SELECT C.NOME, T.TELEFONE, E.UF
+FROM CLIENTE C
+INNER JOIN TELEFONE T ON T.IDTELEFONE = C.IDCLIENTE
+INNER JOIN ENDERECO E ON E.IDENDERECO = C.IDCLIENTE
+ORDER BY 1 ASC;
+```
+
+35 - O que é delimitador?
+
+Delimitador é o que diz aonde acaba nosso código, por padrão é o ‘;’ mas conseguimos mudar com `SET TERM OQVCQUISER ;` exemplo: `SET TERM ^ ;` ou `SET TERM # ;`
+
+36 - O que o `MAX` faz?
+
+O `MAX` retorna o maior valor, exemplo: `SELECT MAX(JANEIRO) AS MAIOR_VALOR FROM VENDEDORES;`
+
+36 - O que o `MIN` faz?
+
+O `MIN` retorna o maior valor, exemplo: `SELECT MIN(JANEIRO) AS MENOR_VALOR FROM VENDEDORES;`
+
+37 - O que devemos fazer quando formos usar uma função de agregação?
+
+Devemos utilizar o `GROUP BY` quando formos colocar uma coluna que não tem agregação agrupando a coluna que não tem agregação, no caso, o índice 1, exemplo:
+
+```sql
+SELECT
+	SEXO, -- COLUNA SEM AGREGAÇÃO
+	SUM(JANEIRO) AS TOTAL_JAN
+FROM
+	VENDEDORES
+GROUP BY 1;
+```
+
+38 - O que o `AVG` faz?
+
+Ele retorna a média de valores `SELECT AVG(JANEIRO) AS MEDIA_VALOR FROM VENDEDORES;`
+
+39 - Para que serve o `SUM`?
+
+Serve para calcularmos o total daquela 
+
+40 - O que é subquary?
+
+Subquary é uma quary dentro de outra, sempre quando há uma subquery ela é lida antes da query principal
+
+```sql
+-- SELECIONAR O NOME E VALOR DO MENOR VENDEDOR DE MARÇO
+SELECT NOME, MARCO AS MIN_MARCO 
+FROM VENDEDORES 
+WHERE MARCO = (SELECT MIN(MARCO) FROM VENDEDORES);
+
+-- QUEM VENDEU MENOS EM MARCO
+SELECT NOME, MARCO AS MIN_MARCO FROM VENDEDORES WHERE MARCO = (SELECT MIN(MARCO) FROM VENDEDORES);
+
+-- QUEM VENDEU MAIS EM MARCO
+SELECT NOME, MARCO AS MAIS_MARCO FROM VENDEDORES WHERE MARCO = (SELECT MAX(MARCO) FROM VENDEDORES);
+
+-- QUEM VENDEU ACIMA DA MÉDIA EM FEVEREIRO
+SELECT NOME, FEVEREIRO AS ACIMA_FEV FROM VENDEDORES WHERE FEVEREIRO > (SELECT AVG(FEVEREIRO) FROM VENDEDORES);
+SELECT NOME, FEVEREIRO AS ACIMA_FEV FROM VENDEDORES WHERE FEVEREIRO < (SELECT AVG(FEVEREIRO) FROM VENDEDORES);
+
+SELECT NOME, FEVEREIRO AS ACIMA_FEV, (SELECT AVG(FEVEREIRO) FROM VENDEDORES) AS MEDIA FROM VENDEDORES WHERE FEVEREIRO < (SELECT AVG(FEVEREIRO) FROM VENDEDORES)
+```
+
+41 - Como funciona os operadores aritméticos no SQL?
+
+Podemos utilizar eles normalmente, veja:
+
+```sql
+-- SOMANDO
+SELECT NOME, JANEIRO, FEVEREIRO, MARCO, (JANEIRO + FEVEREIRO + MARCO) AS TOTAL FROM VENDEDORES;
+
+-- TIRANDO A MÉDIA
+SELECT NOME, JANEIRO, FEVEREIRO, MARCO, (JANEIRO + FEVEREIRO + MARCO) AS TOTAL, ((JANEIRO + FEVEREIRO + MARCO) / 3) AS MEDIA FROM VENDEDORES;
+```
+
+42 - Quais são os tipos de procedures?
+
+1. Passagem de parâmetros;
+2. Retorno de um resultado
+
+43 - Para que serve o `SUSPEND`?
+
+Serve para interromper o código e retornar o valor para a procedure
+
+44 - Como criar uma procedure?
+
+```sql
+SET TERM #;
+
+CREATE OR ALTER PROCEDURE NOMEPROCEDURE
+AS
+BEGIN
+	-- CÓDIGO
+END#
+
+// EXEMPLO DE UMA SOMA
+CREATE PROCEDURE SOMA(VALOR1 INTEGER, VALOR2 INTEGER)
+RETURNS(RESULTADO INTEGER)
+AS
+BEGIN
+	RESULTADO = VALOR1 + VALOR2;
+	SUSPEND; -- SUSPENDENDO O VALOR
+END#
+```
+
+45 - Como podemos ver quais procedures existem?
+
+`SHOW PROCEDURES;`
+
+46 - Como podemos executar uma procedure?
+
+`EXECUTE PROCEDURE NOMEPROCEDURE(PARAMETROS)#`
+
+OU
+
+`SELECT * FROM NOMEPROCEDURE(PARAMETROS)#`
+
+47 - Como colocamos uma variável dentro da nossa procedure?
+
+Utilizamos o `DECLARE VARIABLE`, veja:
+
+```sql
+CREATE OR ALTER PROCEDURE SOMA(VALOR1 INTEGER, VALOR2 INTEGER)
+RETURNS (RESULTADO INTEGER)
+AS
+DECLARE VARIABLE VALOR3 INTEGER;
+BEGIN
+	VALOR3 = 30;
+	RESULTADO = VALOR1 + VALOR2 + VALOR3 + 2;
+	SUSPEND;
+END#
+```
+
+48 - Como podemos apagar uma procedure?
+
+Utilizamos `DROP PROCEDURE NOMEPROCEDURE#`
+
+49 - Como adicionamos uma nova coluna?
+
+```sql
+ALTER TABLE CLIENTE ADD COLUNA_NOVA VARCHAR(30);
+```
+
+50 - Como passamos os dados de uma coluna para outra?
+
+```sql
+UPDATE CURSO SET COLUNA_NOVA = COLUNA_ANTIGA;
+```
+
+51 - Como excluímos uma coluna?
+
+```sql
+ALTER TABLE CURSO DROP COLUNA_ANTIGA;
+```
+
+52 - Como podemos alterar a posição da coluna na tabela?
+
+```sql
+ALTER TABLE CURSO ALTER COLUNA8 POSITION 1;
+```
+
+### Tabela base
+
+```sql
+----------------------------------------------------------------------
+-- CRIAR BANCO DE DADOS
+CREATE DATABASE 'C:\BD\EXERCICIOQUERY.FDB' USER 'SYSDBA' PASSWORD 'MASTERKEY';
+----------------------------------------------------------------------
+
+----------------------------------------------------------------------
+-- CONECTAR AO BANCO DE DADOS
+CONNECT 'C:\BD\EXERCICIOQUERY.FDB' USER 'SYSDBA' PASSWORD 'MASTERKEY';
+----------------------------------------------------------------------
+
+----------------------------------------------------------------------
+-- CRIAR TABELA CLIENTE
+CREATE TABLE CLIENTE (
+	IDCLIENTE INTEGER NOT NULL,
+	NOME VARCHAR(30),
+	PRIMARY KEY(IDCLIENTE)
+);
+----------------------------------------------------------------------
+
+----------------------------------------------------------------------
+-- CRIAR TABELA ENDERECO
+CREATE TABLE ENDERECO (
+	IDENDERECO INTEGER NOT NULL,
+	IDCLIENTE  INTEGER,
+	ENDERECO   VARCHAR(50),
+	PRIMARY KEY(IDENDERECO),
+	FOREIGN KEY(IDCLIENTE) REFERENCES CLIENTE(IDCLIENTE)
+);
+----------------------------------------------------------------------
+
+----------------------------------------------------------------------
+-- CRIAR TABELA TELEFONE
+CREATE TABLE TELEFONE (
+	IDTELEFONE INTEGER NOT NULL,
+	IDCLIENTE  INTEGER,
+	TELEFONE   VARCHAR(20),
+	PRIMARY KEY(IDTELEFONE),
+	FOREIGN KEY(IDCLIENTE) REFERENCES CLIENTE(IDCLIENTE)
+);
+----------------------------------------------------------------------
+
+----------------------------------------------------------------------
+SET TERM ^ ;
+----------------------------------------------------------------------
+
+----------------------------------------------------------------------
+CREATE TRIGGER TG_INSERTIDCLIENTE FOR CLIENTE
+BEFORE INSERT POSITION 0
+AS
+BEGIN
+	NEW.IDCLIENTE = COALESCE((SELECT MAX(IDCLIENTE) FROM CLIENTE), 0) + 1;
+END ^
+----------------------------------------------------------------------
+
+----------------------------------------------------------------------
+CREATE TRIGGER TG_INSERTIDTELEFONE FOR TELEFONE
+BEFORE INSERT POSITION 0
+AS
+BEGIN
+NEW.IDTELEFONE = COALESCE((SELECT MAX(IDTELEFONE) FROM TELEFONE), 0) + 1;
+END ^
+----------------------------------------------------------------------
+
+----------------------------------------------------------------------
+CREATE TRIGGER TG_INSERTIDENDERECO FOR ENDERECO
+BEFORE INSERT POSITION 0
+AS
+BEGIN
+NEW.IDENDERECO = COALESCE((SELECT MAX(IDENDERECO) FROM ENDERECO), 0) + 1;
+END ^
+----------------------------------------------------------------------
+```
+
+### 2ª Tabela base
